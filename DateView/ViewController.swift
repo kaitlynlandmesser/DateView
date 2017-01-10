@@ -50,10 +50,10 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         print("\(daysInLastMonth)")
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        layout.itemSize = CGSize(width: view.frame.width/7, height: view.frame.width/7)
-        layout.minimumInteritemSpacing = 0
-        layout.minimumLineSpacing = 0
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        layout.itemSize = CGSize(width: (view.bounds.width - 110)/7, height: (view.bounds.width - 110)/7)
+        layout.minimumInteritemSpacing = 15
+        layout.minimumLineSpacing = 10
         calendar.collectionViewLayout = layout
         
         super.viewDidLoad()
@@ -101,11 +101,9 @@ class ViewController: UIViewController, UICollectionViewDelegate, UICollectionVi
         
         cell.day.text = "\(todaysDate)"
         
-        let selectionView = UIView(frame: CGRect(x: 10, y: 10, width: cell.bounds.width - 20, height: cell.bounds.width - 20))
-        //selectionView.center = cell.center
+        let selectionView = UIView()
         selectionView.backgroundColor = UIColor.red
         selectionView.layer.cornerRadius = (cell.bounds.width)/2
-        selectionView.layer.masksToBounds = true
         
         cell.selectedBackgroundView = selectionView
         
