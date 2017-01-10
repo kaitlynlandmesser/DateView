@@ -14,6 +14,7 @@
 		4232AD441E2536C100BFC8B4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4232AD421E2536C100BFC8B4 /* LaunchScreen.storyboard */; };
 		4232AD4F1E2536C100BFC8B4 /* DateViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4232AD4E1E2536C100BFC8B4 /* DateViewTests.swift */; };
 		4232AD5A1E2536C100BFC8B4 /* DateViewUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4232AD591E2536C100BFC8B4 /* DateViewUITests.swift */; };
+		4232AD6A1E255FDA00BFC8B4 /* CalendarDayCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4232AD691E255FDA00BFC8B4 /* CalendarDayCollectionViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		4232AD551E2536C100BFC8B4 /* DateViewUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DateViewUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4232AD591E2536C100BFC8B4 /* DateViewUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateViewUITests.swift; sourceTree = "<group>"; };
 		4232AD5B1E2536C100BFC8B4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4232AD691E255FDA00BFC8B4 /* CalendarDayCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CalendarDayCollectionViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 			children = (
 				4232AD391E2536C100BFC8B4 /* AppDelegate.swift */,
 				4232AD3B1E2536C100BFC8B4 /* ViewController.swift */,
+				4232AD691E255FDA00BFC8B4 /* CalendarDayCollectionViewCell.swift */,
 				4232AD3D1E2536C100BFC8B4 /* Main.storyboard */,
 				4232AD401E2536C100BFC8B4 /* Assets.xcassets */,
 				4232AD421E2536C100BFC8B4 /* LaunchScreen.storyboard */,
@@ -262,6 +265,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4232AD6A1E255FDA00BFC8B4 /* CalendarDayCollectionViewCell.swift in Sources */,
 				4232AD3C1E2536C100BFC8B4 /* ViewController.swift in Sources */,
 				4232AD3A1E2536C100BFC8B4 /* AppDelegate.swift in Sources */,
 			);
@@ -514,6 +518,7 @@
 				4232AD601E2536C100BFC8B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4232AD611E2536C100BFC8B4 /* Build configuration list for PBXNativeTarget "DateViewTests" */ = {
 			isa = XCConfigurationList;
@@ -522,6 +527,7 @@
 				4232AD631E2536C100BFC8B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		4232AD641E2536C100BFC8B4 /* Build configuration list for PBXNativeTarget "DateViewUITests" */ = {
 			isa = XCConfigurationList;
@@ -530,6 +536,7 @@
 				4232AD661E2536C100BFC8B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
