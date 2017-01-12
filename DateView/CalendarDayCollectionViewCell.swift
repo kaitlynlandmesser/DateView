@@ -9,5 +9,19 @@
 import UIKit
 
 class CalendarDayCollectionViewCell: UICollectionViewCell {
-    @IBOutlet weak var day: UILabel!
+    var day: UILabel!
+
+    override init(frame: CGRect) {
+        day = UILabel(frame: CGRect(x: 0, y: 0, width: frame.width, height: frame.height))
+        day.font = UIFont(name: "Avenir-Light", size: 15)
+        day.textAlignment = .center
+        
+        super.init(frame: frame)
+        
+        self.addSubview(day)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }
