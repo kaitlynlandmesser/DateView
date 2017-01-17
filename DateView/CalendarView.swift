@@ -14,11 +14,10 @@ protocol CalendarViewDelegate {
 
 class CalendarView: UIView, UIPageViewControllerDelegate, UIPageViewControllerDataSource {
     var delegate: CalendarViewDelegate?
-    
     var pageView: UIPageViewController!
+    var selectedDate = Date()
     
-    var pages = [UIViewController]()
-
+    var centerViewController: MonthViewController!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -30,13 +29,9 @@ class CalendarView: UIView, UIPageViewControllerDelegate, UIPageViewControllerDa
         pageView.dataSource = self
         pageView.view.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: 340)
         
-        pages = [newViewController(month: 1),
-                 newViewController(month: 2),
-                 newViewController(month: 3),
-                 newViewController(month: 4),
-                 newViewController(month: 5)]
+        centerViewController = newViewController(date: selectedDate)
         
-        if let firstViewController = pages.first {
+        if let firstViewController = centerViewController {
             pageView.setViewControllers([firstViewController],
                                direction: .forward,
                                animated: true,
@@ -50,60 +45,39 @@ class CalendarView: UIView, UIPageViewControllerDelegate, UIPageViewControllerDa
         fatalError("init(coder:) has not been implemented")
     }
     
-    func newViewController(month: Int) -> MonthViewController {
+    func newViewController(date: Date) -> MonthViewController {
         let new = MonthViewController()
-        new.month = month
+        new.firstDayOfMonth = date.startOfMonth()
+        new.selectedDay = selectedDate
         new.delegate = self
         return new
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        guard let currentIndex = pages.index(of: viewController) else {
-            return nil
-        }
+        let v = viewController as! MonthViewController
         
-        let nextIndex = currentIndex + 1
-        
-        if nextIndex < pages.count {
-            return pages[nextIndex]
-        }
-        
-        return nil
+        return newViewController(date: v.firstDayOfMonth.nextMonth())
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        guard let currentIndex = pages.index(of: viewController) else {
-            return nil
-        }
         
-        let previous = currentIndex - 1
+        let v = viewController as! MonthViewController
         
-        if previous >= 0 {
-            return pages[previous]
-        }
-        
-        return nil
+        return newViewController(date: v.firstDayOfMonth.previousMonth())
     }
     
     func presentationCount(for pageViewController: UIPageViewController) -> Int {
-        return pages.count
+        return 100
     }
     
     func presentationIndex(for pageViewController: UIPageViewController) -> Int {
-        guard let firstViewController = pageView.viewControllers?.first else {
-            return 0
-        }
-        
-        guard let firstViewControllerIndex = pages.index(of: firstViewController) else {
-            return 0
-        }
-        
-        return firstViewControllerIndex
+        return 50
     }
 }
 
 extension CalendarView: MonthViewControllerDelegate {
     func didSelectDate(date: Date) {
+        selectedDate = date
         self.delegate?.didSelectDate(date: date)
     }
 }

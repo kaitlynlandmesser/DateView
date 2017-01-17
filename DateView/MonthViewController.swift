@@ -14,22 +14,16 @@ protocol MonthViewControllerDelegate {
     func didSelectDate(date: Date)
 }
 class MonthViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
-    struct Day {
-        var date: Date
-        var inCurrentMonth: Bool
-    }
     var delegate: MonthViewControllerDelegate?
     
     var monthLabel: UILabel!
     var collectionView: UICollectionView!
     
     var firstDayOfMonth: Date!
-    var month: Int!
-    
+    var selectedDay: Date?
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        firstDayOfMonth = Calendar(identifier: .gregorian).date(bySetting: .month, value: month, of: Date())?.startOfMonth()
         
         monthLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 40))
         monthLabel.text = "\(firstDayOfMonth.headerFormat)"
@@ -53,7 +47,7 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
         view.addSubview(collectionView)
     }
     
-    func getDate(for indexPath: IndexPath) -> Day? {
+    func getDate(for indexPath: IndexPath) -> Date? {
         if indexPath.section == 0 {
             return nil // it's one of the weekday headers
         }
@@ -63,34 +57,18 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
         let dayOffset = cal.component(.weekday, from: firstDayOfMonth) - 1
         let daysInMonth = cal.component(.day, from: firstDayOfMonth.endOfMonth())
         
-        var todaysDay = ( (indexPath.section - 1) * 7 ) + (indexPath.row + 1) - dayOffset
+        let todaysDay = ( (indexPath.section - 1) * 7 ) + (indexPath.row + 1) - dayOffset
         
         if todaysDay > daysInMonth {
-            todaysDay = todaysDay - daysInMonth
-            
-            guard var nextMonthDate = cal.date(byAdding: .month, value: 1, to: firstDayOfMonth) else {
-                return nil
-            }
-            nextMonthDate = cal.date(bySetting: .day, value: todaysDay, of: nextMonthDate)!
-            
-            return Day(date: nextMonthDate, inCurrentMonth: false)
+            return cal.date(bySetting: .day, value: todaysDay - daysInMonth, of: firstDayOfMonth.nextMonth())
         } else if todaysDay < 1 {
-            guard var lastMonthDate = cal.date(byAdding: .month, value: -1, to: firstDayOfMonth) else {
-                return nil
-            }
-            
+            let lastMonthDate = firstDayOfMonth.previousMonth()
             let daysInLastMonth = cal.component(.day, from: lastMonthDate.endOfMonth())
             
-            todaysDay = todaysDay + daysInLastMonth
-            
-            lastMonthDate = cal.date(bySetting: .day, value: todaysDay, of: lastMonthDate)!
-            
-            return Day(date: lastMonthDate, inCurrentMonth: false)
+            return cal.date(bySetting: .day, value: todaysDay + daysInLastMonth, of: lastMonthDate)
         }
         
-        let date = cal.date(bySetting: .day, value: todaysDay, of: firstDayOfMonth)
-        
-        return Day(date: date!, inCurrentMonth: true)
+        return cal.date(bySetting: .day, value: todaysDay, of: firstDayOfMonth)
     }
 
     // MARK: UICollectionViewDataSource
@@ -105,6 +83,9 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        // three types of resuse : selected cell, today cell, out of month cell, in month cell, not selected cell
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "test", for: indexPath) as! CalendarDayCollectionViewCell
         
         if indexPath.section == 0 {
@@ -112,12 +93,31 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
             cell.day.text = days[indexPath.row]
             return cell
         }
-        
-        let day = getDate(for: indexPath)
-        cell.day.text = day?.date.day
-        
-        if !(day?.inCurrentMonth)! {
-           cell.day.textColor = UIColor.gray
+
+        cell.backgroundView = UIView()
+
+        if let date = getDate(for: indexPath) {
+            cell.day.text = date.day
+            if !firstDayOfMonth.sameMonth(date: date) {
+                cell.day.textColor = UIColor.gray
+                print("gray cell")
+            }
+            
+            if date.isToday {
+                let background = UIView()
+                background.layer.cornerRadius = (cell.bounds.width)/2
+                background.layer.borderWidth = 1
+                background.layer.borderColor = UIColor.red.cgColor
+                
+                cell.backgroundView = background
+            }
+            
+            if let s = selectedDay {
+                if s.sameDay(date: date) {
+                    selectDay(indexPath: indexPath)
+                }
+            }
+            
         }
         
         let selectionView = UIView()
@@ -128,6 +128,18 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
         
         return cell
     }
+    
+    func selectDay(indexPath: IndexPath) {
+        if let cell = collectionView.cellForItem(at: indexPath) {
+            let background = UIView()
+            background.backgroundColor = UIColor.green
+            background.layer.cornerRadius = (cell.bounds.width)/2
+            
+            cell.backgroundView = background
+            
+            cell.isSelected = false
+        }
+    }
 
     // MARK: UICollectionViewDelegate
 
@@ -136,9 +148,8 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if let date = getDate(for: indexPath)?.date {
+        if let date = getDate(for: indexPath) {
             self.delegate?.didSelectDate(date: date)
-            print(date.day)
         }
     }
 }
