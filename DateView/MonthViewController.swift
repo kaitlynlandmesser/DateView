@@ -8,7 +8,10 @@
 
 import UIKit
 
-private let reuseIdentifier = "test"
+private let genericCell = "generic"
+private let todayCell = "today"
+private let selectedCell = "selected"
+private let otherMonthCell = "otherMonth"
 
 protocol MonthViewControllerDelegate {
     func didSelectDate(date: Date)
@@ -39,12 +42,20 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
         
         collectionView = UICollectionView(frame: CGRect(x: 0, y: 40, width: view.frame.width, height: 300), collectionViewLayout: layout)
         collectionView.backgroundColor = UIColor.clear
-        collectionView.register(CalendarDayCollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        collectionView.register(CalendarDayCollectionViewCell.self, forCellWithReuseIdentifier: genericCell)
+        collectionView.register(CalendarDayCollectionViewCell.self, forCellWithReuseIdentifier: todayCell)
+        collectionView.register(CalendarDayCollectionViewCell.self, forCellWithReuseIdentifier: selectedCell)
+        collectionView.register(CalendarDayCollectionViewCell.self, forCellWithReuseIdentifier: otherMonthCell)
+
         collectionView.isOpaque = true
         collectionView.delegate = self
         collectionView.dataSource = self
         
         view.addSubview(collectionView)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        collectionView.reloadData()
     }
     
     func getDate(for indexPath: IndexPath) -> Date? {
@@ -83,10 +94,7 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        // three types of resuse : selected cell, today cell, out of month cell, in month cell, not selected cell
-        
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "test", for: indexPath) as! CalendarDayCollectionViewCell
+        var cell = collectionView.dequeueReusableCell(withReuseIdentifier: genericCell, for: indexPath) as! CalendarDayCollectionViewCell
         
         if indexPath.section == 0 {
             let days = ["S","M","T","W","T","F","S"]
@@ -94,16 +102,14 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
             return cell
         }
 
-        cell.backgroundView = UIView()
-
         if let date = getDate(for: indexPath) {
-            cell.day.text = date.day
             if !firstDayOfMonth.sameMonth(date: date) {
+                cell = collectionView.dequeueReusableCell(withReuseIdentifier: otherMonthCell, for: indexPath) as! CalendarDayCollectionViewCell
                 cell.day.textColor = UIColor.gray
-                print("gray cell")
             }
             
             if date.isToday {
+                cell = collectionView.dequeueReusableCell(withReuseIdentifier: todayCell, for: indexPath) as! CalendarDayCollectionViewCell
                 let background = UIView()
                 background.layer.cornerRadius = (cell.bounds.width)/2
                 background.layer.borderWidth = 1
@@ -114,10 +120,19 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
             
             if let s = selectedDay {
                 if s.sameDay(date: date) {
-                    selectDay(indexPath: indexPath)
+                    cell = collectionView.dequeueReusableCell(withReuseIdentifier: selectedCell, for: indexPath) as! CalendarDayCollectionViewCell
+                    
+                    let background = UIView()
+                    background.backgroundColor = UIColor.green
+                    background.layer.cornerRadius = (cell.bounds.width)/2
+                    
+                    cell.backgroundView = background
+                    
+                    cell.isSelected = false
                 }
             }
             
+            cell.day.text = date.day
         }
         
         let selectionView = UIView()
@@ -127,18 +142,6 @@ class MonthViewController: UIViewController, UICollectionViewDelegate, UICollect
         cell.selectedBackgroundView = selectionView
         
         return cell
-    }
-    
-    func selectDay(indexPath: IndexPath) {
-        if let cell = collectionView.cellForItem(at: indexPath) {
-            let background = UIView()
-            background.backgroundColor = UIColor.green
-            background.layer.cornerRadius = (cell.bounds.width)/2
-            
-            cell.backgroundView = background
-            
-            cell.isSelected = false
-        }
     }
 
     // MARK: UICollectionViewDelegate

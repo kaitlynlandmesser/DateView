@@ -18,16 +18,18 @@ class ViewController: UIViewController {
     var selectedDate = Date()
     
     override func viewDidLoad() {
-        calendar = CalendarView()
-        
+        calendar = CalendarView(frame: CGRect(x: 0, y: 10, width: view.frame.width, height: 360))
+        calendar.selectedDate = selectedDate
+        calendar.center.y  -= calendar.bounds.height
         calendar.delegate = self
         
-        dateButton = UIButton(frame: CGRect(x: 0, y: 0, width: 400, height: 50))
+        dateButton = UIButton(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 50))
         dateButton.setTitle(calendar.selectedDate.full, for: .normal)
         dateButton.setTitleColor(UIColor.black, for: .normal)
         dateButton.titleLabel?.font = UIFont(name: "AvenirNext-Medium", size: 15)
         dateButton.titleLabel?.textAlignment = .center
         dateButton.addTarget(self, action: #selector(ViewController.animateShowCalendar), for: .touchUpInside)
+        dateButton.titleLabel?.textAlignment = .center
 
         backButton = UIButton(frame: CGRect(x: 30, y: 18, width: 13, height: 13))
         backButton.setImage(UIImage(named: "Backward"), for: .normal)
@@ -45,20 +47,19 @@ class ViewController: UIViewController {
     }
     
     func forward() {
-        calendar.selectedDate = calendar.selectedDate.nextDay()
+        selectedDate = calendar.selectedDate.nextDay()
+        calendar.selectedDate = selectedDate
         dateButton.setTitle(calendar.selectedDate.full, for: .normal)
     }
     
     func backward() {
-        calendar.selectedDate = calendar.selectedDate.previousDay()
+        selectedDate = calendar.selectedDate.previousDay()
+        calendar.selectedDate = selectedDate
         dateButton.setTitle(calendar.selectedDate.full, for: .normal)
     }
     
     func animateShowCalendar() {
-        calendar = CalendarView(frame: CGRect(x: 0, y: 10, width: view.frame.width, height: 360))
-        calendar.selectedDate = selectedDate
-        calendar.center.y  -= calendar.bounds.height
-        calendar.delegate = self
+        calendar.setCenter()
 
         view.addSubview(calendar)
 
@@ -72,7 +73,6 @@ class ViewController: UIViewController {
             self.calendar.center.y -= self.calendar.bounds.height
         }, completion: { _ in
             self.calendar.removeFromSuperview()
-            self.calendar = nil
         })
     }
 }
