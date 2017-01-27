@@ -8,7 +8,13 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+protocol DateSelectorViewControllerDelegate {
+    func didSelectNewDate(date: Date)
+}
+
+class DateSelectorViewController: UIViewController {
+    var delegate: DateSelectorViewControllerDelegate?
+    
     var calendar: CalendarView!
     
     var dateButton: UIButton!
@@ -28,16 +34,16 @@ class ViewController: UIViewController {
         dateButton.setTitleColor(UIColor.black, for: .normal)
         dateButton.titleLabel?.font = UIFont(name: "AvenirNext-Medium", size: 15)
         dateButton.titleLabel?.textAlignment = .center
-        dateButton.addTarget(self, action: #selector(ViewController.animateShowCalendar), for: .touchUpInside)
+        dateButton.addTarget(self, action: #selector(DateSelectorViewController.animateShowCalendar), for: .touchUpInside)
         dateButton.titleLabel?.textAlignment = .center
 
         backButton = UIButton(frame: CGRect(x: 30, y: 18, width: 13, height: 13))
         backButton.setImage(UIImage(named: "Backward"), for: .normal)
-        backButton.addTarget(self, action: #selector(ViewController.backward), for: .touchUpInside)
+        backButton.addTarget(self, action: #selector(DateSelectorViewController.backward), for: .touchUpInside)
 
         forwardButton = UIButton(frame: CGRect(x: view.frame.width - 60, y: 18, width: 13, height: 13))
         forwardButton.setImage(UIImage(named: "Forward"), for: .normal)
-        forwardButton.addTarget(self, action: #selector(ViewController.forward), for: .touchUpInside)
+        forwardButton.addTarget(self, action: #selector(DateSelectorViewController.forward), for: .touchUpInside)
 
         view.addSubview(dateButton)
         view.addSubview(backButton)
@@ -50,12 +56,14 @@ class ViewController: UIViewController {
         selectedDate = calendar.selectedDate.nextDay()
         calendar.selectedDate = selectedDate
         dateButton.setTitle(calendar.selectedDate.full, for: .normal)
+        delegate?.didSelectNewDate(date: selectedDate)
     }
     
     func backward() {
         selectedDate = calendar.selectedDate.previousDay()
         calendar.selectedDate = selectedDate
         dateButton.setTitle(calendar.selectedDate.full, for: .normal)
+        delegate?.didSelectNewDate(date: selectedDate)
     }
     
     func animateShowCalendar() {
@@ -77,11 +85,12 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: CalendarViewDelegate {
+extension DateSelectorViewController: CalendarViewDelegate {
     func didSelectDate(date: Date) {
         selectedDate = date
         dateButton.setTitle(calendar.selectedDate.full, for: .normal)
         self.dismissCalendar()
+        delegate?.didSelectNewDate(date: selectedDate)
     }
 }
 
